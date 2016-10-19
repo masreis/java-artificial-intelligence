@@ -7,10 +7,14 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>java-ia</name>
+	<name>java-artificial-intelligence</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
+		<version.compiler.plugin>2.3.1</version.compiler.plugin>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<version.hadoop>2.7.1</version.hadoop>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
