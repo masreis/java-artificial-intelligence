@@ -1,8 +1,6 @@
 package net.marcoreis.training;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 import weka.classifiers.AbstractClassifier;
