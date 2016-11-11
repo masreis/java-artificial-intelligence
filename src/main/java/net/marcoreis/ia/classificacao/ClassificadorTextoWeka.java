@@ -1,16 +1,12 @@
-package net.marcoreis.training;
+package net.marcoreis.ia.classificacao;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
-import weka.classifiers.functions.SMO;
-import weka.classifiers.lazy.IBk;
-import weka.classifiers.rules.PART;
-import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
@@ -21,37 +17,33 @@ import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 import weka.filters.unsupervised.instance.RemoveFrequentValues;
 
+/**
+ * Esta classe faz a classificação de textos utilizando o Weka
+ * 
+ * @author ma@marcoreis.net @
+ *
+ */
 public class ClassificadorTextoWeka {
 	private Instances documentos;
 	private Instances dadosTreinamento;
 	private Instances dadosTeste;
+	private static final Logger logger = Logger.getLogger(ClassificadorTextoWeka.class);
 
-	public static void main(String[] args) {
-		String arquivoDados = "/home/marco/Downloads/acordaos.txt";
-		ClassificadorTextoWeka classificadorTextoWeka = new ClassificadorTextoWeka();
-		classificadorTextoWeka.carregarDados(arquivoDados);
-		classificadorTextoWeka.amostragem();
-		classificadorTextoWeka.preProcessarText();
-		Collection<Classifier> cls = new ArrayList<Classifier>();
-		cls.add(new SMO());
-		cls.add(new IBk(5));
-		cls.add(new PART());
-		cls.add(new J48());
-		for (Classifier c : cls) {
-			classificadorTextoWeka.treinar(c);
-			break;
+	public Instance criarInstancia(String texto) {
+		return null;
+	}
+
+	public void classificar(Classifier classificador, Instance instancia) {
+		try {
+			double resultado = classificador.classifyInstance(instancia);
+			logger.info("Resultado: " + resultado);
+		} catch (Exception e) {
+			logger.error(e);
+			e.printStackTrace();
 		}
 	}
 
-	private void classificar(Classifier classificador) throws Exception {
-		while (dadosTeste.iterator().hasNext()) {
-			Instance next = dadosTeste.iterator().next();
-			double resultado = classificador.classifyInstance(next);
-			System.out.println(resultado);
-		}
-	}
-
-	private void amostragem() {
+	public void criarDadosAmostragem(double percentual) {
 		try {
 			documentos.randomize(new Random());
 			//
@@ -64,7 +56,7 @@ public class ClassificadorTextoWeka {
 			//
 			Resample filtro = new Resample();
 			filtro.setInputFormat(documentos);
-			filtro.setSampleSizePercent(5);
+			filtro.setSampleSizePercent(percentual);
 			documentos = Resample.useFilter(documentos, filtro);
 			//
 			//
@@ -80,16 +72,15 @@ public class ClassificadorTextoWeka {
 			// dadosTreinamento = Filter.useFilter(dadosTreinamento, s);
 			// dadosTeste = Filter.useFilter(dadosTeste, s);
 			// //
-			// System.out.println(dadosTreinamento.attribute(1).numValues());
-			// System.out.println(dadosTeste.attribute(1).numValues());
 			// dadosTreinamento = documentos.trainCV(10, 1);
 			// dadosTeste = documentos.testCV(10, 1);
+			logger.info("Quantidade de itens: " + documentos.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void preProcessarText() {
+	public void preProcessarTexto() {
 		try {
 			StringToWordVector filterString = new StringToWordVector();
 			filterString.setInputFormat(documentos);
@@ -100,8 +91,9 @@ public class ClassificadorTextoWeka {
 			filterString.setWordsToKeep(10000);
 			documentos = Filter.useFilter(documentos, filterString);
 			//
-			dadosTreinamento = documentos.trainCV(10, 1);
+			dadosTreinamento = documentos.trainCV(10, 0);
 			dadosTeste = documentos.testCV(10, 1);
+			logger.info("Texto pré-processado");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -127,39 +119,42 @@ public class ClassificadorTextoWeka {
 			documentos.setClassIndex(0);
 			documentos.renameAttribute(0, "@@classe@@");
 			data = null;
-			System.out.println("Tempo de carregamento (s): " + (System.currentTimeMillis() - inicio) / 1000);
+			logger.info("Quantidade de itens carregados: " + documentos.size());
+			logger.info("Tempo de carregamento (s): " + (System.currentTimeMillis() - inicio) / 1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void treinar(Classifier classificador) {
+	public Classifier treinar(Classifier classificador) {
 		try {
 			// Instances train = new Instances(dataset, 0, trainSize);
 			// Instances test = new Instances(dataset, trainSize, testSize);
 			//
 			classificador.buildClassifier(dadosTreinamento);
-			System.out.println(classificador.getClass());
 			Evaluation eval = new Evaluation(dadosTreinamento);
 			eval.crossValidateModel(classificador, dadosTreinamento, 10, new Random(1));
-			System.out.println(eval.toSummaryString());
-			System.out.println(eval.toClassDetailsString());
 			//
-			testar(classificador);
-			// classificar(classificador);
+			logger.info("\n\n------------------TREINAMENTO------------------\n\n");
+			logger.info("Classificador: " + classificador.getClass());
+			logger.info(eval.toSummaryString());
+			logger.info(eval.toClassDetailsString());
+			return classificador;
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}
 
-	private void testar(Classifier classificador) {
+	public void avaliarModelo(Classifier classificador) {
 		try {
 			// InputMappedClassifier imc = new InputMappedClassifier();
 			Evaluation eval = new Evaluation(dadosTreinamento);
 			eval.evaluateModel(classificador, dadosTeste);
-			System.out.println(eval.toSummaryString());
-			System.out.println(eval.toClassDetailsString());
+			logger.info("\n\n------------------AVALIAÇÃO------------------\n\n");
+			logger.info(eval.toSummaryString());
+			logger.info(eval.toClassDetailsString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

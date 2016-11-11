@@ -7,7 +7,6 @@
 		</layout>
 	</appender>
 
-
 	<!-- <category name="org.hibernate.ehcache"> -->
 	<!-- <priority value="DEBUG" /> -->
 	<!-- </category> -->
