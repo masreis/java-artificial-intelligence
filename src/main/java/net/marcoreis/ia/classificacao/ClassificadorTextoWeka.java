@@ -39,7 +39,7 @@ public class ClassificadorTextoWeka {
 			logger.info("Resultado: " + resultado);
 		} catch (Exception e) {
 			logger.error(e);
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 

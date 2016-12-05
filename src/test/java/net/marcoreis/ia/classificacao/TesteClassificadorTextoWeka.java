@@ -1,4 +1,4 @@
-package net.marcoreis.ia.classificacao.teste;
+package net.marcoreis.ia.classificacao;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +54,7 @@ public class TesteClassificadorTextoWeka {
 			Classifier modelo = classificadorTextoWeka.treinar(c);
 			classificadorTextoWeka.avaliarModelo(modelo);
 			Instance instancia = classificadorTextoWeka.criarInstancia(criarTextoExemplo());
-			classificadorTextoWeka.classificar(modelo, instancia);
+//			classificadorTextoWeka.classificar(modelo, instancia);
 		}
 
 	}
