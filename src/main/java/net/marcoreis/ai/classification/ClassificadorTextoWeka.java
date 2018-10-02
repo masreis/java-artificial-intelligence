@@ -1,4 +1,4 @@
-package net.marcoreis.ia.classificacao;
+package net.marcoreis.ai.classification;
 
 import java.io.File;
 import java.util.Random;
@@ -20,22 +20,25 @@ import weka.filters.unsupervised.instance.RemoveFrequentValues;
 /**
  * Esta classe faz a classificação de textos utilizando o Weka
  * 
- * @author ma@marcoreis.net @
+ * @author ma@marcoreis.net
  *
  */
 public class ClassificadorTextoWeka {
 	private Instances documentos;
 	private Instances dadosTreinamento;
 	private Instances dadosTeste;
-	private static final Logger logger = Logger.getLogger(ClassificadorTextoWeka.class);
+	private static final Logger logger =
+			Logger.getLogger(ClassificadorTextoWeka.class);
 
 	public Instance criarInstancia(String texto) {
 		return null;
 	}
 
-	public void classificar(Classifier classificador, Instance instancia) {
+	public void classificar(Classifier classificador,
+			Instance instancia) {
 		try {
-			double resultado = classificador.classifyInstance(instancia);
+			double resultado =
+					classificador.classifyInstance(instancia);
 			logger.info("Resultado: " + resultado);
 		} catch (Exception e) {
 			logger.error(e);
@@ -47,7 +50,8 @@ public class ClassificadorTextoWeka {
 		try {
 			documentos.randomize(new Random());
 			//
-			RemoveFrequentValues rfv = new RemoveFrequentValues();
+			RemoveFrequentValues rfv =
+					new RemoveFrequentValues();
 			rfv.setAttributeIndex("1");
 			rfv.setInputFormat(documentos);
 			rfv.setModifyHeader(true);
@@ -74,7 +78,8 @@ public class ClassificadorTextoWeka {
 			// //
 			// dadosTreinamento = documentos.trainCV(10, 1);
 			// dadosTeste = documentos.testCV(10, 1);
-			logger.info("Quantidade de itens: " + documentos.size());
+			logger.info(
+					"Quantidade de itens: " + documentos.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,14 +87,16 @@ public class ClassificadorTextoWeka {
 
 	public void preProcessarTexto() {
 		try {
-			StringToWordVector filterString = new StringToWordVector();
+			StringToWordVector filterString =
+					new StringToWordVector();
 			filterString.setInputFormat(documentos);
 			filterString.setLowerCaseTokens(true);
 			filterString.setIDFTransform(true);
 			filterString.setTFTransform(true);
 			filterString.setDebug(true);
 			filterString.setWordsToKeep(10000);
-			documentos = Filter.useFilter(documentos, filterString);
+			documentos =
+					Filter.useFilter(documentos, filterString);
 			//
 			dadosTreinamento = documentos.trainCV(10, 0);
 			dadosTeste = documentos.testCV(10, 1);
@@ -119,8 +126,11 @@ public class ClassificadorTextoWeka {
 			documentos.setClassIndex(0);
 			documentos.renameAttribute(0, "@@classe@@");
 			data = null;
-			logger.info("Quantidade de itens carregados: " + documentos.size());
-			logger.info("Tempo de carregamento (s): " + (System.currentTimeMillis() - inicio) / 1000);
+			logger.info("Quantidade de itens carregados: "
+					+ documentos.size());
+			logger.info("Tempo de carregamento (s): "
+					+ (System.currentTimeMillis() - inicio)
+							/ 1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -133,10 +143,13 @@ public class ClassificadorTextoWeka {
 			//
 			classificador.buildClassifier(dadosTreinamento);
 			Evaluation eval = new Evaluation(dadosTreinamento);
-			eval.crossValidateModel(classificador, dadosTreinamento, 10, new Random(1));
+			eval.crossValidateModel(classificador,
+					dadosTreinamento, 10, new Random(1));
 			//
-			logger.info("\n\n------------------TREINAMENTO------------------\n\n");
-			logger.info("Classificador: " + classificador.getClass());
+			logger.info(
+					"\n\n------------------TREINAMENTO------------------\n\n");
+			logger.info("Classificador: "
+					+ classificador.getClass());
 			logger.info(eval.toSummaryString());
 			logger.info(eval.toClassDetailsString());
 			return classificador;
@@ -152,7 +165,8 @@ public class ClassificadorTextoWeka {
 			// InputMappedClassifier imc = new InputMappedClassifier();
 			Evaluation eval = new Evaluation(dadosTreinamento);
 			eval.evaluateModel(classificador, dadosTeste);
-			logger.info("\n\n------------------AVALIAÇÃO------------------\n\n");
+			logger.info(
+					"\n\n------------------AVALIAÇÃO------------------\n\n");
 			logger.info(eval.toSummaryString());
 			logger.info(eval.toClassDetailsString());
 		} catch (Exception e) {

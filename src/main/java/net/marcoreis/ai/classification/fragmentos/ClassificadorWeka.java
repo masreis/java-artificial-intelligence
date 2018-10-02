@@ -1,4 +1,4 @@
-package net.marcoreis.ia.classificacao.fragmentos;
+package net.marcoreis.ai.classification.fragmentos;
 
 import java.io.File;
 import java.util.Random;
@@ -14,12 +14,15 @@ public class ClassificadorWeka {
 	public static void main(String args[]) {
 		// Classifier classificador = new J48();
 		Classifier classificador = new IBk();
-		String arquivoDados = "/home/marco/git/java-artificial-intelligence/src/main/resources/bank-marketing-data-set/bank.csv";
+		String arquivoDados =
+				"/home/marco/git/java-artificial-intelligence/src/main/resources/bank-marketing-data-set/bank.csv";
 		//
-		new ClassificadorWeka().classificar(classificador, arquivoDados);
+		new ClassificadorWeka().classificar(classificador,
+				arquivoDados);
 	}
 
-	public void classificar(Classifier classificador, String arquivoDados) {
+	public void classificar(Classifier classificador,
+			String arquivoDados) {
 		try {
 			long inicio = System.currentTimeMillis();
 			CSVLoader loader = new CSVLoader();
@@ -44,14 +47,21 @@ public class ClassificadorWeka {
 				//
 				// System.out.println("Treinamento: " + trainingData.size());
 				// System.out.println("Teste: " + testingData.size());
-				Classifier copiaClassificador = AbstractClassifier.makeCopy(classificador);
+				Classifier copiaClassificador =
+						AbstractClassifier
+								.makeCopy(classificador);
 				copiaClassificador.buildClassifier(trainingData);
-				eval.evaluateModel(copiaClassificador, testingData);
+				eval.evaluateModel(copiaClassificador,
+						testingData);
 			}
 			//
-			System.out.println("\n\nClassificador: " + classificador.getClass().getName());
-			System.out.println(eval.toSummaryString("\nResultados\n======", false));
-			System.out.println("Tempo de processamento (s): " + (System.currentTimeMillis() - inicio) / 1000);
+			System.out.println("\n\nClassificador: "
+					+ classificador.getClass().getName());
+			System.out.println(eval.toSummaryString(
+					"\nResultados\n======", false));
+			System.out.println("Tempo de processamento (s): "
+					+ (System.currentTimeMillis() - inicio)
+							/ 1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

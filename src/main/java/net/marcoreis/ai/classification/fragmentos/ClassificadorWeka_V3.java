@@ -1,4 +1,4 @@
-package net.marcoreis.ia.classificacao.fragmentos;
+package net.marcoreis.ai.classification.fragmentos;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,7 +14,8 @@ import weka.core.converters.CSVLoader;
 public class ClassificadorWeka_V3 {
 	public static void main(String args[]) {
 		// Classifier classificador = new J48();
-		String arquivoDados = "/home/marco/git/java-artificial-intelligence/src/main/resources/bank-marketing-data-set/bank.csv";
+		String arquivoDados =
+				"/home/marco/git/java-artificial-intelligence/src/main/resources/bank-marketing-data-set/bank.csv";
 		//
 		new ClassificadorWeka_V3().classificar(arquivoDados);
 	}
@@ -31,7 +32,8 @@ public class ClassificadorWeka_V3 {
 			data.setClassIndex(data.numAttributes() - 1);
 			int folds = 10;
 			Instances randData = new Instances(data);
-			Collection<Classifier> cls = new ArrayList<Classifier>();
+			Collection<Classifier> cls =
+					new ArrayList<Classifier>();
 			cls.add(new IBk());
 			int n = 0;
 			for (int i = 0; n < folds; i++) {
@@ -41,12 +43,19 @@ public class ClassificadorWeka_V3 {
 
 					long inicio = System.currentTimeMillis();
 					c.buildClassifier(data);
-					Evaluation eval = new Evaluation(trainingData);
-					eval.crossValidateModel(c, data, 10, new Random(1));
+					Evaluation eval =
+							new Evaluation(trainingData);
+					eval.crossValidateModel(c, data, 10,
+							new Random(1));
 					// eval.evaluateModel(c, testingData);
-					System.out.println("\n\nClassificador: " + c.getClass().getName());
-					System.out.println(eval.toSummaryString("\nResultados\n======\n", false));
-					System.out.println("Tempo de processamento (s): " + (System.currentTimeMillis() - inicio) / 1000);
+					System.out.println("\n\nClassificador: "
+							+ c.getClass().getName());
+					System.out.println(eval.toSummaryString(
+							"\nResultados\n======\n", false));
+					System.out.println(
+							"Tempo de processamento (s): "
+									+ (System.currentTimeMillis()
+											- inicio) / 1000);
 				}
 			}
 		} catch (Exception e) {
