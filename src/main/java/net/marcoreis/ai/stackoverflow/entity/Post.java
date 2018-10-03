@@ -1,4 +1,4 @@
-package net.marcoreis.ai.entity.stackoverflow;
+package net.marcoreis.ai.stackoverflow.entity;
 
 @lombok.Data
 public class Post {

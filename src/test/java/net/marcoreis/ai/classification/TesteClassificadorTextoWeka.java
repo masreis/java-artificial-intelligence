@@ -8,6 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import net.marcoreis.ai.legal.classification.ClassificadorTextoWeka;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
 import weka.core.Instance;

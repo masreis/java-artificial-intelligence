@@ -1,4 +1,4 @@
-package net.marcoreis.ai.classification;
+package net.marcoreis.ai.stackoverflow.classification;
 
 import java.io.File;
 import java.util.Random;
@@ -23,16 +23,12 @@ import weka.filters.unsupervised.instance.RemoveFrequentValues;
  * @author ma@marcoreis.net
  *
  */
-public class ClassificadorTextoWeka {
+public class StackOverflowClassifier {
 	private Instances documentos;
 	private Instances dadosTreinamento;
 	private Instances dadosTeste;
 	private static final Logger logger =
-			Logger.getLogger(ClassificadorTextoWeka.class);
-
-	public Instance criarInstancia(String texto) {
-		return null;
-	}
+			Logger.getLogger(StackOverflowClassifier.class);
 
 	public void classificar(Classifier classificador,
 			Instance instancia) {
@@ -52,7 +48,7 @@ public class ClassificadorTextoWeka {
 			//
 			RemoveFrequentValues rfv =
 					new RemoveFrequentValues();
-			rfv.setAttributeIndex("1");
+			rfv.setAttributeIndex("2");
 			rfv.setInputFormat(documentos);
 			rfv.setModifyHeader(true);
 			rfv.setNumValues(10);
@@ -79,7 +75,7 @@ public class ClassificadorTextoWeka {
 			// dadosTreinamento = documentos.trainCV(10, 1);
 			// dadosTeste = documentos.testCV(10, 1);
 			logger.info(
-					"Quantidade de itens: " + documentos.size());
+					"Itens na amostra: " + documentos.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -98,21 +94,23 @@ public class ClassificadorTextoWeka {
 			documentos =
 					Filter.useFilter(documentos, filterString);
 			//
-			dadosTreinamento = documentos.trainCV(10, 0);
-			dadosTeste = documentos.testCV(10, 1);
 			logger.info("Texto pré-processado");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void gerarDadosTreinamentoETeste() {
+		dadosTreinamento = documentos.trainCV(15, 5);
+		dadosTeste = documentos.testCV(15, 3);
+	}
+
 	public void carregarDados(String arquivoDados) {
 		try {
 			long inicio = System.currentTimeMillis();
 			CSVLoader loader = new CSVLoader();
+			loader.setFieldSeparator("¬");
 			loader.setFile(new File(arquivoDados));
-			loader.setFieldSeparator("^");
-			loader.setBufferSize(2000);
 			Instances data = loader.getDataSet();
 			//
 			NominalToString filterNT = new NominalToString();
@@ -120,14 +118,20 @@ public class ClassificadorTextoWeka {
 			data = Filter.useFilter(data, filterNT);
 			//
 			Remove remove = new Remove();
+			// Inverte a seleção, ou seja, inclui os campos removidos
+			remove.setInvertSelection(true);
+			// Adiciona os campos body, title e tags
+			// 12 - body
+			// 17 - title
+			// 18 - tags
+			remove.setAttributeIndices("17,18");
 			remove.setInputFormat(data);
-			remove.setOptions(new String[] { "-R", "1,2,3" });
 			documentos = Filter.useFilter(data, remove);
-			documentos.setClassIndex(0);
-			documentos.renameAttribute(0, "@@classe@@");
+			// Seleciona o campo tag como o classificador
+			documentos.setClassIndex(1);
 			data = null;
-			logger.info("Quantidade de itens carregados: "
-					+ documentos.size());
+			logger.info(
+					"Itens no dataset: " + documentos.size());
 			logger.info("Tempo de carregamento (s): "
 					+ (System.currentTimeMillis() - inicio)
 							/ 1000);
@@ -138,9 +142,6 @@ public class ClassificadorTextoWeka {
 
 	public Classifier treinar(Classifier classificador) {
 		try {
-			// Instances train = new Instances(dataset, 0, trainSize);
-			// Instances test = new Instances(dataset, trainSize, testSize);
-			//
 			classificador.buildClassifier(dadosTreinamento);
 			Evaluation eval = new Evaluation(dadosTreinamento);
 			eval.crossValidateModel(classificador,
@@ -160,9 +161,9 @@ public class ClassificadorTextoWeka {
 
 	}
 
-	public void avaliarModelo(Classifier classificador) {
+	public void avaliarModelo(Classifier classificador,
+			boolean showSummary, boolean showDetail) {
 		try {
-			// InputMappedClassifier imc = new InputMappedClassifier();
 			Evaluation eval = new Evaluation(dadosTreinamento);
 			eval.evaluateModel(classificador, dadosTeste);
 			logger.info(
