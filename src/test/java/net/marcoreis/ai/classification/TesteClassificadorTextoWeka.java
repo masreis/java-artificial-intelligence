@@ -9,9 +9,11 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import net.marcoreis.ai.legal.classification.ClassificadorTextoWeka;
+import net.marcoreis.ai.util.UtilML;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
 import weka.core.Instance;
+import weka.core.Instances;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TesteClassificadorTextoWeka {
@@ -25,8 +27,10 @@ public class TesteClassificadorTextoWeka {
 	}
 
 	@Test
-	public void teste1CarregarDados() {
-		classificadorTextoWeka.carregarDados(arquivoDados);
+	public void teste1CarregarDados() throws Exception {
+		Instances instancias = new UtilML()
+				.carregarInstanciasEmenta(arquivoDados);
+		classificadorTextoWeka.setDocumentos(instancias);
 	}
 
 	@Test

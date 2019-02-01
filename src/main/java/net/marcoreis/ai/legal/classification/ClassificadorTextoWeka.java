@@ -1,6 +1,5 @@
 package net.marcoreis.ai.legal.classification;
 
-import java.io.File;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -9,11 +8,8 @@ import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.CSVLoader;
 import weka.filters.Filter;
 import weka.filters.supervised.instance.Resample;
-import weka.filters.unsupervised.attribute.NominalToString;
-import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 import weka.filters.unsupervised.instance.RemoveFrequentValues;
 
@@ -32,6 +28,10 @@ public class ClassificadorTextoWeka {
 
 	public Instance criarInstancia(String texto) {
 		return null;
+	}
+
+	public void clustering(Instances instances) {
+
 	}
 
 	public void classificar(Classifier classificador,
@@ -106,36 +106,6 @@ public class ClassificadorTextoWeka {
 		}
 	}
 
-	public void carregarDados(String arquivoDados) {
-		try {
-			long inicio = System.currentTimeMillis();
-			CSVLoader loader = new CSVLoader();
-			loader.setFile(new File(arquivoDados));
-			loader.setFieldSeparator("^");
-			loader.setBufferSize(2000);
-			Instances data = loader.getDataSet();
-			//
-			NominalToString filterNT = new NominalToString();
-			filterNT.setInputFormat(data);
-			data = Filter.useFilter(data, filterNT);
-			//
-			Remove remove = new Remove();
-			remove.setInputFormat(data);
-			remove.setOptions(new String[] { "-R", "1,2,3" });
-			documentos = Filter.useFilter(data, remove);
-			documentos.setClassIndex(0);
-			documentos.renameAttribute(0, "@@classe@@");
-			data = null;
-			logger.info("Quantidade de itens carregados: "
-					+ documentos.size());
-			logger.info("Tempo de carregamento (s): "
-					+ (System.currentTimeMillis() - inicio)
-							/ 1000);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public Classifier treinar(Classifier classificador) {
 		try {
 			// Instances train = new Instances(dataset, 0, trainSize);
@@ -172,5 +142,9 @@ public class ClassificadorTextoWeka {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void setDocumentos(Instances documentos) {
+		this.documentos = documentos;
 	}
 }
